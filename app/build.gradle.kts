@@ -60,5 +60,8 @@ dependencies {
 
     implementation("androidx.compose.runtime:runtime-livedata:1.9.4")
 
-    implementation("io.coil-kt:coil-compose:2.7.0")
+    implementation("io.coil-kt:coil-compose:2.7.0")//for Async Image
+
+    val nav_version = "2.9.6"
+    implementation("androidx.navigation:navigation-compose:$nav_version")
 }

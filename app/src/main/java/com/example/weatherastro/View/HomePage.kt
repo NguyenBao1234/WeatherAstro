@@ -1,7 +1,8 @@
-package com.example.weatherastro
+package com.example.weatherastro.View
 
 
 import android.util.Log
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -36,18 +37,17 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
-import com.example.weatherastro.api.ApiState
-import com.example.weatherastro.api.WeatherModel
+import com.example.weatherastro.ViewModel.WeatherVM
+import com.example.weatherastro.Model.ApiState
+import com.example.weatherastro.Model.WeatherModel
 
 @Composable
-fun WeatherPage(inViewModel : WeatherVM)
+fun HomePage(inViewModel : WeatherVM, onDetailClick : () -> Unit)
 {
     val WeatherResponseState = inViewModel.mWeatherResponse.observeAsState()
-    val LocalController = LocalSoftwareKeyboardController.current
     var mCity by remember { mutableStateOf("") }
-    Column (modifier = Modifier
-        .fillMaxWidth()
-        .padding(8.dp), horizontalAlignment = Alignment.CenterHorizontally)
+    val LocalController = LocalSoftwareKeyboardController.current
+    Column (modifier = Modifier.fillMaxWidth().padding(8.dp), horizontalAlignment = Alignment.CenterHorizontally)
     {
         Row (modifier = Modifier
             .fillMaxWidth()
@@ -74,14 +74,14 @@ fun WeatherPage(inViewModel : WeatherVM)
         when(val result = WeatherResponseState.value)
         {
             is ApiState.Error -> Text(result.message)
-            ApiState.Loading -> CircularProgressIndicator()
-            is ApiState.Success<WeatherModel> -> DrawWeatherDetails(result.dataInstance)
+            is ApiState.Loading -> CircularProgressIndicator()
+            is ApiState.Success<WeatherModel> -> DrawWeatherDetails(result.dataInstance, onDetailClick)
             null ->{}
         }
     }
 }
 @Composable
-fun DrawWeatherDetails(inWeatherData: WeatherModel)
+fun DrawWeatherDetails(inWeatherData: WeatherModel,  onDetailClick : () -> Unit)
 {
     Column (modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp), horizontalAlignment = Alignment.CenterHorizontally)
     {
@@ -106,7 +106,10 @@ fun DrawWeatherDetails(inWeatherData: WeatherModel)
         Text(inWeatherData.current.condition.text, color = Color.Gray)
         //___________________________________________
         Spacer(Modifier.height(15.dp))
-        Card {
+        Card (modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp)
+            .clickable { onDetailClick() }){
             Column (Modifier.fillMaxWidth(), verticalArrangement = Arrangement.SpaceAround)
             {
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceAround)

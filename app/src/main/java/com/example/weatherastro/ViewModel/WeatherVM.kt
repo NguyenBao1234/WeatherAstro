@@ -1,13 +1,13 @@
-package com.example.weatherastro
+package com.example.weatherastro.ViewModel
 
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.weatherastro.api.ApiState
+import com.example.weatherastro.Model.ApiState
 import com.example.weatherastro.api.RetrofitObj
-import com.example.weatherastro.api.WeatherModel
+import com.example.weatherastro.Model.WeatherModel
 import kotlinx.coroutines.launch
 
 class WeatherVM : ViewModel()
@@ -20,7 +20,7 @@ class WeatherVM : ViewModel()
         Log.i("Requesting City Name:" ,inCityName)
         _WeatherApiResponse.value = ApiState.Loading
 
-        viewModelScope.launch{
+        viewModelScope.launch {
             try
             {
                 val ResponseData = WeatherApiInst.GetWeatherData("2715a0ad04c246f9854163700250111", inCityName)

@@ -1,4 +1,4 @@
-package com.example.weatherastro.api
+package com.example.weatherastro.Model
 
 sealed class ApiState<out T>
 {
