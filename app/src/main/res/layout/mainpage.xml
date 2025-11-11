@@ -4,7 +4,7 @@
                                                    xmlns:tools="http://schemas.android.com/tools"
                                                    android:layout_width="match_parent"
                                                    android:layout_height="match_parent"
-                                                   android:background="@drawable/HOME_PAGE"
+                                                   android:background="@drawable/home_page"
                                                    tools:context=".MainActivity">
 
     <!-- Thanh tìm kiếm -->
@@ -46,12 +46,12 @@
                 android:tint="@android:color/white" />
     </LinearLayout>
 
-    <!-- Icon mưa -->
+    <!-- Icon thời tiết -->
     <ImageView
             android:id="@+id/weather_icon"
             android:layout_width="120dp"
             android:layout_height="120dp"
-            android:src="@drawable/Rain"
+            android:src="@drawable/rain"
             android:layout_marginTop="16dp"
             app:layout_constraintTop_toBottomOf="@id/top_bar"
             app:layout_constraintStart_toStartOf="parent"
@@ -83,19 +83,20 @@
 
     <!-- Hộp thông tin -->
 
-    <!-- Dự báo -->
+    <!-- Dự báo 3 ngày -->
     <LinearLayout
-            android:gravity="center"
             android:id="@+id/info_box"
-            android:layout_width="377dp"
-            android:layout_height="231dp"
-            android:layout_margin="16dp"
+            android:layout_width="388dp"
+            android:layout_height="286dp"
             android:orientation="vertical"
-            android:background="@drawable/Weather_Info"
+            android:gravity="center"
             android:padding="16dp"
+            android:layout_margin="16dp"
+            android:background="@drawable/weather_info"
+            app:layout_constraintTop_toBottomOf="@id/weather_desc"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent" app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent">
+            app:layout_constraintEnd_toEndOf="parent" app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintVertical_bias="0.209">
 
         <GridLayout
                 android:layout_width="match_parent"
@@ -110,7 +111,9 @@
                     android:background="@drawable/mono_detail"
                     android:textColor="@android:color/black"
                     android:padding="10dp"
-                    android:layout_margin="6dp" android:layout_height="60dp" android:layout_width="153dp"/>
+                    android:layout_margin="6dp"
+                    android:layout_height="60dp"
+                    android:layout_width="153dp"/>
 
             <TextView
                     android:text="24.0\nTốc độ gió"
@@ -118,7 +121,9 @@
                     android:background="@drawable/mono_detail1"
                     android:textColor="@android:color/black"
                     android:padding="10dp"
-                    android:layout_margin="6dp" android:layout_height="55dp" android:layout_width="142dp"/>
+                    android:layout_margin="6dp"
+                    android:layout_height="55dp"
+                    android:layout_width="142dp"/>
 
             <TextView
                     android:text="0.0\nMức độ UV"
@@ -126,7 +131,9 @@
                     android:background="@drawable/mono_detail1"
                     android:textColor="@android:color/black"
                     android:padding="10dp"
-                    android:layout_margin="6dp" android:layout_height="56dp" android:layout_width="152dp"/>
+                    android:layout_margin="6dp"
+                    android:layout_height="56dp"
+                    android:layout_width="152dp"/>
 
             <TextView
                     android:text="NNE\nHướng gió"
@@ -134,32 +141,34 @@
                     android:background="@drawable/mono_detail1"
                     android:textColor="@android:color/black"
                     android:padding="10dp"
-                    android:layout_margin="6dp" android:layout_height="56dp" android:layout_width="145dp"/>
+                    android:layout_margin="6dp"
+                    android:layout_height="56dp"
+                    android:layout_width="145dp"/>
         </GridLayout>
-
     </LinearLayout>
     <LinearLayout
-            android:layout_width="393dp"
-            android:layout_height="224dp"
+            android:id="@+id/forecast_box"
+            android:layout_width="389dp"
+            android:layout_height="218dp"
             android:orientation="vertical"
-            android:background="@drawable/Weather_Info"
             android:padding="16dp"
-            android:layout_margin="16dp" app:layout_constraintTop_toBottomOf="@+id/info_box"
-            app:layout_constraintBottom_toBottomOf="parent" app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent" android:id="@+id/linearLayout">
+            android:layout_margin="16dp"
+            android:background="@drawable/weather_info"
+            app:layout_constraintTop_toBottomOf="@id/info_box"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" app:layout_constraintBottom_toBottomOf="parent">
 
-        <!-- Dòng 1 -->
+        <!-- Dòng dự báo -->
         <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:columnCount="2"
-                android:padding="8dp"
-                android:useDefaultMargins="true">>
+                android:orientation="horizontal"
+                android:paddingVertical="4dp">
 
             <TextView
-                    android:layout_width="250"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_columnWeight="1"
+                    android:layout_weight="1"
                     android:text="Hôm nay"
                     android:textColor="@android:color/white"
                     android:textSize="16sp"/>
@@ -172,19 +181,17 @@
                     android:textSize="16sp"/>
         </LinearLayout>
 
-        <!-- Dòng 2 -->
+
         <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:padding="10dp"
-                android:paddingVertical="4dp"
-
-                android:gravity="center_vertical|space_between">
+                android:paddingVertical="4dp">
 
             <TextView
-                    android:layout_width="250"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_weight="1"
                     android:text="Ngày mai"
                     android:textColor="@android:color/white"
                     android:textSize="16sp"/>
@@ -197,18 +204,16 @@
                     android:textSize="16sp"/>
         </LinearLayout>
 
-        <!-- Dòng 3 -->
         <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:paddingVertical="4dp"
-                android:padding="10dp"
-                android:gravity="center_vertical|space_between">
+                android:paddingVertical="4dp">
 
             <TextView
-                    android:layout_width="250"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_weight="1"
                     android:text="Ngày kia"
                     android:textColor="@android:color/white"
                     android:textSize="16sp"/>
@@ -220,6 +225,7 @@
                     android:textColor="@android:color/white"
                     android:textSize="16sp"/>
         </LinearLayout>
+
 
         <!-- Nút chi tiết -->
         <Button
