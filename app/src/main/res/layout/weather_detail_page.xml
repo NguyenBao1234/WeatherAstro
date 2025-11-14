@@ -1,0 +1,379 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                                                   xmlns:app="http://schemas.android.com/apk/res-auto"
+                                                   xmlns:tools="http://schemas.android.com/tools"
+                                                   android:layout_width="match_parent"
+                                                   android:layout_height="match_parent"
+                                                   android:background="@drawable/home_page"
+                                                   tools:context=".MainActivity">
+
+    <!-- ICON -->
+
+    <!-- NHIỆT ĐỘ -->
+    <ImageView
+            android:id="@+id/weather_icon"
+            android:layout_width="120dp"
+            android:layout_height="120dp"
+            android:src="@drawable/rain"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" android:layout_marginTop="40dp"/>
+    <TextView
+            android:id="@+id/temp_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="26°C"
+            android:textColor="@android:color/white"
+            android:textSize="48sp"
+            android:textStyle="bold"
+            app:layout_constraintTop_toBottomOf="@id/weather_icon"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- MÔ TẢ -->
+    <TextView
+            android:id="@+id/weather_desc"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Sương mù"
+            android:textColor="@android:color/white"
+            android:textSize="18sp"
+            app:layout_constraintTop_toBottomOf="@id/temp_text"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- KHỐI 1 -->
+
+    <!-- KHỐI 2 -->
+    <LinearLayout
+            android:id="@+id/info_box_1"
+            android:layout_width="400dp"
+            android:layout_height="375dp"
+            android:orientation="vertical"
+            android:padding="16dp"
+            android:layout_margin="16dp"
+            android:background="@drawable/weather_info"
+            app:layout_constraintTop_toBottomOf="@id/weather_desc"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintVertical_bias="0.2">
+
+        <!-- Độ ẩm lớn -->
+        <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="70dp"
+                android:padding="10dp"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:background="@drawable/mono_detail"
+                android:layout_marginBottom="12dp">
+
+            <TextView
+                    android:id="@+id/humidity_value"
+                    android:text="94%"
+                    android:textStyle="bold"
+                    android:textColor="#000000"
+                    android:textSize="20sp" android:layout_height="wrap_content" android:layout_width="wrap_content"/>
+
+            <TextView
+                    android:id="@+id/humidity_label"
+                    android:text="Độ ẩm"
+                    android:textColor="#000000"
+                    android:textSize="14sp" android:layout_height="wrap_content" android:layout_width="52dp"/>
+        </LinearLayout>
+
+        <!-- GRID 1 -->
+        <GridLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:columnCount="2"
+                android:rowCount="3"
+                android:useDefaultMargins="true">
+
+            <!-- TEMPLATE CARD -->
+            <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="70dp"
+                    android:layout_columnWeight="1"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:padding="10dp"
+                    android:background="@drawable/mono_detail"
+                    android:layout_margin="6dp">
+
+                <TextView
+                        android:text="12.6 km/h"
+                        android:id="@+id/wind_speed_value"
+                        android:textStyle="bold"
+                        android:textSize="16sp"
+                        android:textColor="#000000" android:layout_height="wrap_content"
+                        android:layout_width="wrap_content"/>
+
+                <TextView
+                        android:text="Tốc độ gió"
+                        android:id="@+id/wind_speed_label"
+                        android:textSize="14sp"
+                        android:textColor="#000000" android:layout_height="wrap_content"
+                        android:layout_width="wrap_content"/>
+            </LinearLayout>
+
+            <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="70dp"
+                    android:layout_columnWeight="1"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:padding="10dp"
+                    android:background="@drawable/mono_detail"
+                    android:layout_margin="6dp">
+
+                <TextView
+                        android:text="NNE"
+                        android:id="@+id/wind_direction_value"
+                        android:textStyle="bold"
+                        android:textSize="16sp"
+                        android:textColor="#000000" android:layout_height="wrap_content"
+                        android:layout_width="wrap_content"/>
+
+                <TextView
+                        android:text="Hướng gió"
+                        android:id="@+id/wind_direction_label"
+                        android:textSize="14sp"
+                        android:textColor="#000000" android:layout_height="wrap_content"
+                        android:layout_width="wrap_content"/>
+            </LinearLayout>
+
+            <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="70dp"
+                    android:layout_columnWeight="1"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:padding="10dp"
+                    android:background="@drawable/mono_detail"
+                    android:layout_margin="6dp">
+
+                <TextView
+                        android:text="0.99 atm"
+                        android:id="@+id/pressure_value"
+                        android:textStyle="bold"
+                        android:textSize="16sp"
+                        android:textColor="#000000" android:layout_height="wrap_content"
+                        android:layout_width="wrap_content"/>
+
+                <TextView
+                        android:text="Áp suất"
+                        android:id="@+id/pressure_label"
+                        android:textSize="14sp"
+                        android:textColor="#000000" android:layout_height="wrap_content"
+                        android:layout_width="wrap_content"/>
+            </LinearLayout>
+
+            <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="70dp"
+                    android:layout_columnWeight="1"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:padding="10dp"
+                    android:background="@drawable/mono_detail"
+                    android:layout_margin="6dp">
+
+                <TextView
+                        android:text="25%"
+                        android:id="@+id/cloud_value"
+                        android:textStyle="bold"
+                        android:textSize="16sp"
+                        android:textColor="#000000" android:layout_height="wrap_content"
+                        android:layout_width="wrap_content"/>
+
+                <TextView
+                        android:text="Mây che phủ"
+                        android:id="@+id/cloud_label"
+                        android:textSize="14sp"
+                        android:textColor="#000000" android:layout_height="wrap_content"
+                        android:layout_width="wrap_content"/>
+            </LinearLayout>
+
+            <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="70dp"
+                    android:layout_columnWeight="1"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:padding="10dp"
+                    android:background="@drawable/mono_detail"
+                    android:layout_margin="6dp">
+
+                <TextView
+                        android:text="25%"
+                        android:id="@+id/rain_chance_value"
+                        android:textStyle="bold"
+                        android:textSize="16sp"
+                        android:textColor="#000000" android:layout_height="wrap_content"
+                        android:layout_width="wrap_content"/>
+
+                <TextView
+                        android:text="Tỷ lệ mưa"
+                        android:id="@+id/rain_chance_label"
+                        android:textSize="14sp"
+                        android:textColor="#000000" android:layout_height="wrap_content"
+                        android:layout_width="wrap_content"/>
+            </LinearLayout>
+
+            <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="70dp"
+                    android:layout_columnWeight="1"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:padding="10dp"
+                    android:background="@drawable/mono_detail"
+                    android:layout_margin="6dp">
+
+                <TextView
+                        android:text="0 mm"
+                        android:id="@+id/precip_value"
+                        android:textStyle="bold"
+                        android:textSize="16sp"
+                        android:textColor="#000000" android:layout_height="wrap_content"
+                        android:layout_width="wrap_content"/>
+
+                <TextView
+                        android:text="Lượng mưa"
+                        android:id="@+id/precip_label"
+                        android:textSize="14sp"
+                        android:textColor="#000000" android:layout_height="wrap_content"
+                        android:layout_width="wrap_content"/>
+            </LinearLayout>
+
+        </GridLayout>
+    </LinearLayout>
+    <LinearLayout
+            android:id="@+id/info_box_2"
+            android:layout_width="445dp"
+            android:layout_height="210dp"
+            android:orientation="vertical"
+            android:padding="16dp"
+            android:layout_margin="16dp"
+            android:background="@drawable/weather_info"
+            app:layout_constraintTop_toBottomOf="@id/info_box_1"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
+
+        <GridLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:columnCount="2"
+                android:useDefaultMargins="true">
+
+            <!-- TEMPLATE KHỐI 2 -->
+            <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="70dp"
+                    android:layout_columnWeight="1"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:background="@drawable/mono_detail"
+                    android:layout_margin="6dp"
+                    android:padding="10dp">
+
+                <TextView
+                        android:id="@+id/dew_temp_value"
+                        android:text="23°C"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        android:textColor="#000000" android:layout_height="wrap_content"
+                        android:layout_width="wrap_content"/>
+
+                <TextView
+                        android:id="@+id/dew_temp_label"
+                        android:text="Nhiệt độ ẩm"
+                        android:textSize="14sp"
+                        android:textColor="#000000" android:layout_height="wrap_content"
+                        android:layout_width="wrap_content"/>
+            </LinearLayout>
+
+            <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="70dp"
+                    android:layout_columnWeight="1"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:background="@drawable/mono_detail"
+                    android:layout_margin="6dp"
+                    android:padding="10dp">
+
+                <TextView
+                        android:id="@+id/wind_temp_value"
+                        android:text="18°C"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        android:textColor="#000000" android:layout_height="wrap_content"
+                        android:layout_width="wrap_content"/>
+
+                <TextView
+                        android:id="@+id/wind_temp_label"
+                        android:text="Nhiệt độ gió"
+                        android:textSize="14sp"
+                        android:textColor="#000000" android:layout_height="wrap_content"
+                        android:layout_width="wrap_content"/>
+            </LinearLayout>
+
+            <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="70dp"
+                    android:layout_columnWeight="1"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:background="@drawable/mono_detail"
+                    android:layout_margin="6dp"
+                    android:padding="10dp">
+
+                <TextView
+                        android:id="@+id/uv_value"
+                        android:text="0.0"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        android:textColor="#000000" android:layout_height="wrap_content"
+                        android:layout_width="wrap_content"/>
+
+                <TextView
+                        android:id="@+id/uv_label"
+                        android:text="Chỉ số UV"
+                        android:textSize="14sp"
+                        android:textColor="#000000" android:layout_height="wrap_content"
+                        android:layout_width="wrap_content"/>
+            </LinearLayout>
+
+            <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="70dp"
+                    android:layout_columnWeight="1"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:background="@drawable/mono_detail"
+                    android:layout_margin="6dp"
+                    android:padding="10dp">
+
+                <TextView
+                        android:id="@+id/visibility_value"
+                        android:text="10 km"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        android:textColor="#000000" android:layout_height="wrap_content"
+                        android:layout_width="wrap_content"/>
+
+                <TextView
+                        android:id="@+id/visibility_label"
+                        android:text="Tầm nhìn xa"
+                        android:textSize="14sp"
+                        android:textColor="#000000" android:layout_height="wrap_content"
+                        android:layout_width="wrap_content"/>
+            </LinearLayout>
+
+        </GridLayout>
+
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
