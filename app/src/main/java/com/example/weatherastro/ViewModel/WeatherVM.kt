@@ -15,6 +15,8 @@ class WeatherVM : ViewModel()
     private val WeatherApiInst = RetrofitObj.WeatherApiInstance
     private val _WeatherApiResponse = MutableLiveData<ApiState<WeatherModel>>()
     val mWeatherResponse : LiveData<ApiState<WeatherModel>> = _WeatherApiResponse
+
+
     fun GetData(inCityName:String)
     {
         Log.i("Requesting City Name:" ,inCityName)
