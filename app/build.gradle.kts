@@ -68,4 +68,6 @@ dependencies {
 
     val nav_version = "2.9.6"
     implementation("androidx.navigation:navigation-compose:$nav_version")
+
+    implementation("com.google.android.gms:play-services-location:21.3.0")
 }

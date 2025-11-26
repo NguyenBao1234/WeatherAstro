@@ -45,6 +45,7 @@ import com.example.weatherastro.Model.WeatherModel
 fun HomePage(inViewModel : WeatherVM, onDetailClick : () -> Unit)
 {
     val WeatherResponseState = inViewModel.mWeatherResponse.observeAsState()
+
     var mCity by remember { mutableStateOf("") }
     val LocalController = LocalSoftwareKeyboardController.current
     Column (modifier = Modifier.fillMaxWidth().padding(8.dp), horizontalAlignment = Alignment.CenterHorizontally)
@@ -75,13 +76,13 @@ fun HomePage(inViewModel : WeatherVM, onDetailClick : () -> Unit)
         {
             is ApiState.Error -> Text(result.message)
             is ApiState.Loading -> CircularProgressIndicator()
-            is ApiState.Success<WeatherModel> -> DrawWeatherDetails(result.dataInstance, onDetailClick)
+            is ApiState.Success<WeatherModel> -> DrawWeatherOverview(result.dataInstance, onDetailClick)
             null ->{}
         }
     }
 }
 @Composable
-fun DrawWeatherDetails(inWeatherData: WeatherModel,  onDetailClick : () -> Unit)
+fun DrawWeatherOverview(inWeatherData: WeatherModel, onDetailClick : () -> Unit)
 {
     Column (modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp), horizontalAlignment = Alignment.CenterHorizontally)
     {
