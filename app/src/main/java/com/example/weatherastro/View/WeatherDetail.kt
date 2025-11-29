@@ -37,6 +37,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import coil.compose.AsyncImage
 import com.example.weatherastro.Model.ApiState
+import com.example.weatherastro.Model.Forecast.ForecastModel
 import com.example.weatherastro.Model.WeatherModel
 import com.example.weatherastro.ViewModel.WeatherVM
 import com.example.weatherastro.R
@@ -45,7 +46,7 @@ import com.example.weatherastro.R
 @Composable()
 fun WeatherDetail (inWeatherVM : WeatherVM, onBackPress : ()-> Unit)
 {
-    val WeatherResponseState = inWeatherVM.mWeatherResponse.observeAsState()
+    val WeatherResponseState = inWeatherVM.forecastResponse.observeAsState()
     Column(modifier = Modifier.fillMaxSize()) {
         IconButton(onClick = {onBackPress()}) {
             Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Quay lại")
@@ -55,13 +56,13 @@ fun WeatherDetail (inWeatherVM : WeatherVM, onBackPress : ()-> Unit)
         {
             is ApiState.Error -> Text(result.message)
             is ApiState.Loading -> CircularProgressIndicator()
-            is ApiState.Success<WeatherModel> -> DrawDetailPage(result.dataInstance)
+            is ApiState.Success<ForecastModel> -> DrawDetailPage(result.dataInstance)
             null ->{}
         }
     }
 }
 @Composable
-fun DrawDetailPage(inWeatherData: WeatherModel)
+fun DrawDetailPage(inWeatherData: ForecastModel)
 {
     Column(
         modifier = Modifier
@@ -97,7 +98,7 @@ fun DrawDetailPage(inWeatherData: WeatherModel)
 }
 
 @Composable
-fun WeatherInfoBox1(inWheatherdata: WeatherModel)
+fun WeatherInfoBox1(inWheatherdata: ForecastModel)
 {
     Column(
         modifier = Modifier
@@ -123,13 +124,13 @@ fun WeatherInfoBox1(inWheatherdata: WeatherModel)
             }
             // Hàng 2
             Row(modifier = Modifier.fillMaxWidth()) {
-                GridItem(value = "${inWheatherdata.current.pressure_in} atm", label = "Áp suất", modifier = Modifier.weight(1f))
+                GridItem(value = "${inWheatherdata.current.pressure_in} inHg", label = "Áp suất", modifier = Modifier.weight(1f))
                 GridItem(value = "${inWheatherdata.current.cloud}%", label = "Mây che phủ", modifier = Modifier.weight(1f))
             }
             // Hàng 3
             Row(modifier = Modifier.fillMaxWidth()) {
-                GridItem(value = "${inWheatherdata.current.condition.text}%", label = "Tỷ lệ mưa", modifier = Modifier.weight(1f))
-                GridItem(value = "${inWheatherdata.current.heatindex_c} mm", label = "Heat", modifier = Modifier.weight(1f))
+                GridItem(value = "${inWheatherdata.current.precip_mm}mm", label = "Lượng mưa", modifier = Modifier.weight(1f))
+                GridItem(value = "${inWheatherdata.current.gust_kph} km/h", label = "Gió giật", modifier = Modifier.weight(1f))
             }
         }
     }
@@ -184,7 +185,7 @@ fun GridItem(value: String, label: String, modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun WeatherInfoBox2(data: WeatherModel) {
+fun WeatherInfoBox2(data: ForecastModel) {
     Column(
         modifier = Modifier
             .fillMaxWidth(0.9f) // Giới hạn chiều rộng
@@ -195,7 +196,7 @@ fun WeatherInfoBox2(data: WeatherModel) {
         Column {
             // Hàng 1
             Row(modifier = Modifier.fillMaxWidth()) {
-                GridItem(value = "${data.current.dewpoDouble_c}°C", label = "Nhiệt độ ẩm", modifier = Modifier.weight(1f))
+                GridItem(value = "${data.current.feelslike_c}°C", label = "Cảm thấy như", modifier = Modifier.weight(1f))
                 GridItem(value = "${data.current.windchill_c}°C", label = "Nhiệt độ gió", modifier = Modifier.weight(1f))
             }
             // Hàng 2
