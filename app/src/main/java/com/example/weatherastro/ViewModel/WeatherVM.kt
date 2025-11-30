@@ -27,7 +27,7 @@ class WeatherVM : ViewModel()
         viewModelScope.launch {
             try
             {
-                val ResponseData = WeatherApiInst.GetForecastData("2715a0ad04c246f9854163700250111", inCityName,14)
+                val ResponseData = WeatherApiInst.GetForecastData("2715a0ad04c246f9854163700250111", inCityName,13)
                 if(ResponseData.isSuccessful)
                 {
                     Log.i("APIResponse Success:",ResponseData.body().toString())

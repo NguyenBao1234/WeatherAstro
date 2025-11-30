@@ -3,12 +3,16 @@ package com.example.weatherastro.View
 
 import android.util.Log
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -26,10 +30,14 @@ import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Tab
+import androidx.compose.material3.TabRow
+import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -39,19 +47,21 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.paint
+
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.example.weatherastro.ViewModel.WeatherVM
 import com.example.weatherastro.Model.ApiState
 import com.example.weatherastro.Model.Forecast.ForecastModel
-import com.example.weatherastro.Model.WeatherModel
 import com.example.weatherastro.R
 
 @Composable
@@ -61,54 +71,79 @@ fun HomePage(inViewModel : WeatherVM, onDetailClick : () -> Unit)
 
     var mCity by remember { mutableStateOf("") }
     val LocalController = LocalSoftwareKeyboardController.current
-    Column (
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(8.dp)
-            .paint(painter = painterResource(id = R.drawable.home_page))
-            .verticalScroll(rememberScrollState(0)),
 
-        horizontalAlignment = Alignment.CenterHorizontally)
-    {
-        Row (modifier = Modifier
-            .fillMaxWidth()
-            .padding(18.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceEvenly)
-        {
-            OutlinedTextField(
-                modifier = Modifier.weight(1F),
-                value = mCity,
-                singleLine = true,
-                onValueChange = { mCity = it },
-                label = {Text("search address")},
-                keyboardOptions = KeyboardOptions(
-                    imeAction = ImeAction.Search  // Hiển thị nút Search trên bàn phím
-                ),
-                keyboardActions = KeyboardActions(
-                    onSearch = {
-                        inViewModel.GetData(mCity)
-                        LocalController?.hide()
-                    }
-                )
-            )
-
-            IconButton({
-                inViewModel.GetData(mCity)
-                LocalController?.hide()
-            })
-            {
-                Icon(imageVector = Icons.Default.Search, contentDescription = "search address")
-            }
-
+    val bgImage = when (val result = WeatherResponseState.value) {
+        is ApiState.Success<ForecastModel> -> {
+            val currentWeather = result.dataInstance.current
+            val conditionCode = currentWeather.condition.code
+            val isDay = currentWeather.is_day == 1
+            getBackgroundByCode(conditionCode, isDay)
         }
-        //___________________________________________
-        when(val result = WeatherResponseState.value)
+        else -> R.drawable.home_page
+    }
+
+    val focusManager = LocalFocusManager.current
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color.Transparent)
+    ) {
+        Image(
+            painter = painterResource(id = bgImage),
+            contentDescription = null,
+            modifier = Modifier.fillMaxSize()
+        )
+        Column (
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(15.dp)
+                .verticalScroll(rememberScrollState(0)),
+
+            horizontalAlignment = Alignment.CenterHorizontally)
         {
-            is ApiState.Error -> Text(result.message)
-            is ApiState.Loading -> CircularProgressIndicator()
-            is ApiState.Success<ForecastModel> -> DrawWeatherOverview(result.dataInstance, onDetailClick)
-            null ->{}
+            Row (modifier = Modifier
+                .fillMaxWidth()
+                .padding(18.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceEvenly)
+            {
+                OutlinedTextField(
+                    modifier = Modifier.weight(1F),
+                    value = mCity,
+                    singleLine = true,
+                    onValueChange = { mCity = it },
+                    label = {Text("search address")},
+                    keyboardOptions = KeyboardOptions(
+                        imeAction = ImeAction.Search  // Hiển thị nút Search trên bàn phím
+                    ),
+                    keyboardActions = KeyboardActions(
+                        onSearch = {
+                            inViewModel.GetData(mCity)
+                            LocalController?.hide()
+                            focusManager.clearFocus()
+                        }
+                    )
+                )
+
+                IconButton({
+                    inViewModel.GetData(mCity)
+                    LocalController?.hide()
+                    focusManager.clearFocus()
+                })
+                {
+                    Icon(imageVector = Icons.Default.Search, contentDescription = "search address")
+                }
+
+            }
+            //___________________________________________
+            when(val result = WeatherResponseState.value)
+            {
+                is ApiState.Error -> Text(result.message)
+                is ApiState.Loading -> CircularProgressIndicator()
+                is ApiState.Success<ForecastModel> -> DrawWeatherOverview(result.dataInstance, onDetailClick)
+                null ->{}
+            }
         }
     }
+
 }
 @Composable
 fun DrawWeatherOverview(inWeatherData: ForecastModel, onDetailClick : () -> Unit)
@@ -136,7 +171,7 @@ fun DrawWeatherOverview(inWeatherData: ForecastModel, onDetailClick : () -> Unit
         )
         Log.i("Log", inWeatherData.current.condition.icon)
         //___________________________________________
-        Text(inWeatherData.current.condition.text, color = Color.Gray)
+        Text(inWeatherData.current.condition.text, color = Color(0xA6FFFFFF))
         //___________________________________________
         Spacer(Modifier.height(15.dp))
         Card (
@@ -145,7 +180,7 @@ fun DrawWeatherOverview(inWeatherData: ForecastModel, onDetailClick : () -> Unit
                 .padding(16.dp)
                 .clickable { onDetailClick() },
             colors = CardDefaults.cardColors(containerColor = Color(0x4DFFFFFF)),
-            border = BorderStroke(2.dp, Color.White)
+            border = BorderStroke(1.dp, Color.White)
         ){
             Column (Modifier.fillMaxWidth(), verticalArrangement = Arrangement.SpaceAround)
             {
@@ -166,6 +201,8 @@ fun DrawWeatherOverview(inWeatherData: ForecastModel, onDetailClick : () -> Unit
                 }
             }
         }
+        WeatherForecastScreen(inWeatherData)
+        Spacer(Modifier.height(45.dp))
     }
 }
 @Composable
@@ -177,5 +214,86 @@ fun DrawColumnProperty(inProperty:String, inValue:String)
     {
         Text(inValue, fontSize = 24.sp, fontWeight = FontWeight.Bold, color = Color.White)
         Text(inProperty, color = Color.White)
+    }
+}
+
+@Composable
+fun WeatherForecastScreen(inWeatherData: ForecastModel) {
+    var selectedTab by remember { mutableStateOf(0) }
+    val tabs = listOf("Dự báo theo giờ", "Dự báo theo tuần")
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(
+//                Brush.verticalGradient(
+//                    colors = listOf(
+//                        Color(0xFF1A1A2E),
+//                        Color(0xFF16213E),
+//                        Color(0xFF0F3460)
+//                    )
+//                )
+                shape = RoundedCornerShape(15.dp),
+                color = Color(0x4D0F3460)
+            )
+            .padding(16.dp),
+    ) {
+        // Tab Row
+        TabRow(
+            selectedTabIndex = selectedTab,
+            containerColor = Color.Transparent,
+            divider = {
+                Divider(
+                    color = Color.Gray,
+                    thickness = 1.dp
+                )
+            },
+            indicator = { tabPositions ->
+                Box(
+                    modifier = Modifier
+                        .tabIndicatorOffset(tabPositions[selectedTab])
+                        .height(3.dp)
+                        .padding(horizontal = 24.dp)
+                        .background(
+                            Color(0xFF00335D),
+                            shape = RoundedCornerShape(topStart = 3.dp, topEnd = 3.dp)
+                        )
+                )
+            }
+
+        ) {
+            tabs.forEachIndexed { index, title ->
+                Tab(
+                    selected = selectedTab == index,
+                    onClick = { selectedTab = index },
+                    text = {
+                        Text(
+                            text = title,
+                            fontSize = 16.sp,
+                            fontWeight = if (selectedTab == index) FontWeight.Bold else FontWeight.Normal,
+                            color = if (selectedTab == index) Color.White else Color.White.copy(alpha = 0.6f)
+                        )
+                    }
+                )
+            }
+        }
+
+        Spacer(modifier = Modifier.height(24.dp))
+
+        // Content
+        when (selectedTab) {
+            0 -> HourlyForecastPage(inWeatherData)
+            1 -> WeeklyForecastContent(inWeatherData)
+        }
+    }
+}
+
+fun getBackgroundByCode(inConditionCode: Int, isDay: Boolean): Int {
+    return when (inConditionCode) {
+        1000 -> if (isDay) R.drawable.sunny_background else R.drawable.home_page
+        1003, 1006, 1009 -> R.drawable.cloud_background
+        1150, 1153, 1063, 1180, 1183, 1186, 1189, 1192, 1195, 1198, 1201, 1240, 1243, 1246, 1249, 1273, 1276 -> R.drawable.rain_background
+        1066, 1210 -> R.drawable.snow_background
+        else -> R.drawable.cloud_background
     }
 }
