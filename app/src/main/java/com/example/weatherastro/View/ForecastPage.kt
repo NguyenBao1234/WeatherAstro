@@ -1,14 +1,16 @@
 package com.example.weatherastro.View
 
-import android.os.Build
-import androidx.annotation.RequiresApi
+
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -16,16 +18,24 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
+
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.weatherastro.Model.Forecast.ForecastDay
+import androidx.compose.ui.window.Dialog
+
 import com.example.weatherastro.Model.Forecast.ForecastModel
 import com.example.weatherastro.Model.Forecast.Hour
 import java.time.LocalDate
@@ -35,7 +45,7 @@ import java.util.Locale
 
 @Composable
 fun HourlyForecastPage(inWeatherData: ForecastModel) {
-
+    var selectedHour by remember { mutableStateOf<Hour?>(null) }
     val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
     val localTime = LocalDateTime.parse(inWeatherData.location.localtime, formatter)
     val hourlyData = inWeatherData.forecast.forecastday[0].hour
@@ -51,13 +61,20 @@ fun HourlyForecastPage(inWeatherData: ForecastModel) {
             val hour = futureHours[index]
             val hourTime = LocalDateTime.parse(hour.time, formatter)
             val isNow = hourTime.hour == localTime.hour
-            HourlyForecastCard(hour, isNow)
+            HourlyForecastCard(hour, isNow, { hourParam->
+                selectedHour = hourParam})
         }
+    }
+    selectedHour?.let { hour ->
+        HourDetailDialog(
+            hour = hour,
+            onDismiss = { selectedHour = null }
+        )
     }
 }
 
 @Composable
-fun HourlyForecastCard(hour: Hour, isNow: Boolean = false) {
+fun HourlyForecastCard(hour: Hour, isNow: Boolean = false, OnClick:(Hour) -> Unit) {
     val time = hour.time.split(" ")[1] // Lấy phần giờ từ "2024-01-01 14:00"
 
     Column(
@@ -68,6 +85,7 @@ fun HourlyForecastCard(hour: Hour, isNow: Boolean = false) {
                 if (isNow) Color.White.copy(alpha = 0.2f) else Color.White.copy(alpha = 0.1f),
                 shape = RoundedCornerShape(20.dp)
             )
+            .clickable(onClick = {OnClick(hour)})
             .padding(vertical = 16.dp, horizontal = 12.dp)
     ) {
         // Time
@@ -210,4 +228,118 @@ fun convertDateToDayOfWeek(dateString: String): String {
     val vietnameseFormatter = DateTimeFormatter.ofPattern("EEEE", vietnameseLocale)
 
     return date.format(vietnameseFormatter)
+}
+
+
+@Composable
+fun HourDetailDialog(hour: Hour, onDismiss: () -> Unit) {
+    val time = hour.time.split(" ")[1]
+
+    Dialog(onDismissRequest = onDismiss) {
+        Card(
+            modifier = Modifier
+                .padding(8.dp),
+            shape = RoundedCornerShape(16.dp),
+            colors = CardDefaults.cardColors(
+                containerColor = Color(0xFF16213E)
+            )
+        ) {
+            Column(
+                modifier = Modifier.padding(24.dp)
+            ) {
+                // Header
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = "Chi tiết lúc $time",
+                        color = Color.White,
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                    IconButton(onClick = onDismiss) {
+                        Text("✕", color = Color.White, fontSize = 24.sp)
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                // Temperature & Icon
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    WeatherIcon(
+                        conditionCode = hour.condition.code,
+                        isDay = hour.is_day == "1",
+                        modifier = Modifier.size(60.dp)
+                    )
+                    Spacer(modifier = Modifier.width(16.dp))
+                    Text(
+                        text = "${hour.temp_c.toDouble().toInt()}°C",
+                        color = Color.White,
+                        fontSize = 48.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                Text(
+                    text = hour.condition.text,
+                    color = Color.White.copy(alpha = 0.8f),
+                    fontSize = 16.sp,
+                    modifier = Modifier.align(Alignment.CenterHorizontally)
+                )
+
+                Spacer(modifier = Modifier.height(24.dp))
+
+                // Weather Details Grid
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    WeatherDetailRow("Cảm giác như", "${hour.feelslike_c.toDouble().toInt()}°C")
+                    WeatherDetailRow("Độ ẩm", "${hour.humidity}%")
+                    WeatherDetailRow("Tốc độ gió", "${hour.wind_kph} km/h")
+                    WeatherDetailRow("Hướng gió", hour.wind_dir)
+                    WeatherDetailRow("Tầm nhìn", "${hour.vis_km} km")
+                    WeatherDetailRow("Áp suất", "${hour.pressure_mb} mb")
+                    WeatherDetailRow("Lượng mưa", "${hour.precip_mm} mm")
+                    WeatherDetailRow("Xác suất mưa", "${hour.chance_of_rain}%")
+                    WeatherDetailRow("Chỉ số UV", hour.uv)
+                    WeatherDetailRow("Mây", "${hour.cloud}%")
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun WeatherDetailRow(label: String, value: String) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(
+                Color.White.copy(alpha = 0.1f),
+                shape = RoundedCornerShape(12.dp)
+            )
+            .padding(horizontal = 16.dp, vertical = 12.dp),
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Text(
+            text = label,
+            color = Color.White.copy(alpha = 0.7f),
+            fontSize = 14.sp
+        )
+        Text(
+            text = value,
+            color = Color.White,
+            fontSize = 14.sp,
+            fontWeight = FontWeight.SemiBold
+        )
+    }
 }
