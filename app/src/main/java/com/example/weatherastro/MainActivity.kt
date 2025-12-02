@@ -11,9 +11,13 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.core.app.ActivityCompat
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
+import com.example.weatherastro.Model.Forecast.ForecastModel
+import com.example.weatherastro.View.ForecastDayDetail
 import com.example.weatherastro.View.WeatherDetail
 import com.example.weatherastro.View.HomePage
 import com.example.weatherastro.ViewModel.WeatherVM
@@ -33,11 +37,27 @@ class MainActivity : ComponentActivity()
             val mNavController = rememberNavController()
             NavHost(navController = mNavController, startDestination = Route.Home, builder = {
                 composable(Route.Home) {
-                    HomePage(mWeatherModel, onDetailClick = {
-                    mNavController.navigate(Route.WeatherDetail)} )
+                    HomePage(mWeatherModel,
+                            onDetailClick = {mNavController.navigate(Route.WeatherDetail)},
+                        OnWeeklyForcastClick = {dayIndexParam->
+                            mNavController.navigate(Route.forecastDayRoute(dayIndexParam))
+                        })
                 }
-                composable(Route.WeatherDetail) {  WeatherDetail(mWeatherModel, onBackPress ={
-                    mNavController.navigate(Route.Home)})
+                composable(Route.WeatherDetail) {
+                    WeatherDetail(mWeatherModel,
+                        onBackPress ={mNavController.navigate(Route.Home)})
+                }
+                composable(
+                    route = Route.ForcastDayDetail,
+                    arguments = listOf(navArgument("dayIndex") { type = NavType.IntType })
+                ) { backStackEntry ->
+                    val dayIndex = backStackEntry.arguments?.getInt("dayIndex") ?: 0
+
+                    ForecastDayDetail(
+                        inWeatherVM = mWeatherModel,
+                        dayIndex = dayIndex,
+                        onBackPress = { mNavController.popBackStack() }
+                    )
                 }
             })
         }

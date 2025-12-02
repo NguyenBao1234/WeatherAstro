@@ -20,7 +20,12 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.Tab
+import androidx.compose.material3.TabRow
+import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -35,6 +40,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import com.example.weatherastro.Model.Forecast.ForecastDay
 
 import com.example.weatherastro.Model.Forecast.ForecastModel
 import com.example.weatherastro.Model.Forecast.Hour
@@ -43,13 +49,84 @@ import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 
+
 @Composable
-fun HourlyForecastPage(inWeatherData: ForecastModel) {
+fun WeatherForecastScreen(inWeatherData: ForecastModel, OnWeeklyCardClick: (Int) -> Unit) {
+    var selectedTab by remember { mutableStateOf(0) }
+    val tabs = listOf("Dự báo theo giờ", "Dự báo theo tuần")
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(
+//                Brush.verticalGradient(
+//                    colors = listOf(
+//                        Color(0xFF1A1A2E),
+//                        Color(0xFF16213E),
+//                        Color(0xFF0F3460)
+//                    )
+//                )
+                shape = RoundedCornerShape(15.dp),
+                color = Color(0x4D0F3460)
+            )
+            .padding(16.dp),
+    ) {
+        // Tab Row
+        TabRow(
+            selectedTabIndex = selectedTab,
+            containerColor = Color.Transparent,
+            divider = {
+                HorizontalDivider(
+                    color = Color.Gray,
+                    thickness = 1.dp
+                )
+            },
+            indicator = { tabPositions ->
+                Box(
+                    modifier = Modifier
+                        .tabIndicatorOffset(tabPositions[selectedTab])
+                        .height(3.dp)
+                        .padding(horizontal = 24.dp)
+                        .background(
+                            Color(0xFF00335D),
+                            shape = RoundedCornerShape(topStart = 3.dp, topEnd = 3.dp)
+                        )
+                )
+            }
+
+        ) {
+            tabs.forEachIndexed { index, title ->
+                Tab(
+                    selected = selectedTab == index,
+                    onClick = { selectedTab = index },
+                    text = {
+                        Text(
+                            text = title,
+                            fontSize = 16.sp,
+                            fontWeight = if (selectedTab == index) FontWeight.Bold else FontWeight.Normal,
+                            color = if (selectedTab == index) Color.White else Color.White.copy(alpha = 0.6f)
+                        )
+                    }
+                )
+            }
+        }
+
+        Spacer(modifier = Modifier.height(24.dp))
+
+        // Content
+        when (selectedTab) {
+            0 -> HourlyForecastPage(inWeatherData.forecast.forecastday[0].hour,inWeatherData.location.localtime )
+            1 -> WeeklyForecastContent(inWeatherData, {dayIndexParam->OnWeeklyCardClick(dayIndexParam)})
+        }
+    }
+}
+@Composable
+fun HourlyForecastPage(inHourData: List<Hour>, inLocaltime: String, isForecastDay : Boolean = false) {
     var selectedHour by remember { mutableStateOf<Hour?>(null) }
     val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
-    val localTime = LocalDateTime.parse(inWeatherData.location.localtime, formatter)
-    val hourlyData = inWeatherData.forecast.forecastday[0].hour
-    val futureHours = hourlyData.filter {
+    val localTime = LocalDateTime.parse(inLocaltime, formatter)
+
+    val futureHours = inHourData.filter {
         val hourTime = LocalDateTime.parse(it.time, formatter)
         hourTime.hour >= localTime.hour
     }
@@ -61,7 +138,7 @@ fun HourlyForecastPage(inWeatherData: ForecastModel) {
             val hour = futureHours[index]
             val hourTime = LocalDateTime.parse(hour.time, formatter)
             val isNow = hourTime.hour == localTime.hour
-            HourlyForecastCard(hour, isNow, { hourParam->
+            HourlyForecastCard(hour, isNow, isForecastDay, { hourParam->
                 selectedHour = hourParam})
         }
     }
@@ -74,7 +151,7 @@ fun HourlyForecastPage(inWeatherData: ForecastModel) {
 }
 
 @Composable
-fun HourlyForecastCard(hour: Hour, isNow: Boolean = false, OnClick:(Hour) -> Unit) {
+fun HourlyForecastCard(hour: Hour, isNow: Boolean = false, isForecastDay : Boolean, OnClick:(Hour) -> Unit) {
     val time = hour.time.split(" ")[1] // Lấy phần giờ từ "2024-01-01 14:00"
 
     Column(
@@ -90,7 +167,7 @@ fun HourlyForecastCard(hour: Hour, isNow: Boolean = false, OnClick:(Hour) -> Uni
     ) {
         // Time
         Text(
-            text = if (isNow) "Bây giờ" else time,
+            text = if (isNow && !isForecastDay) "Bây giờ" else time,
             color = Color.White,
             fontSize = 14.sp,
             fontWeight = if (isNow) FontWeight.Bold else FontWeight.Normal
@@ -131,7 +208,7 @@ fun WeatherIcon(conditionCode: Int, isDay: Boolean, modifier: Modifier = Modifie
         Text(
             text = when (conditionCode) {
                 1000 -> if (isDay) "☀️" else "🌙"          // Sunny / Clear
-                1003, 1006 -> if(isDay) "⛅" else "☁️"                         // Partly cloudy, cloudy
+                1003, 1006 -> if(isDay) "⛅" else "☁️"     // Partly cloudy, cloudy
                 1009 -> "☁️"                               // Overcast
                 1150, 1153, 1063, 1180, 1183, 1186, 1189, 1192, 1195, 1198, 1201, 1240, 1243, 1246, 1249, 1273, 1276 -> "🌧️"
                 1066, 1210 -> "🌨️"                         // Snow
@@ -142,7 +219,7 @@ fun WeatherIcon(conditionCode: Int, isDay: Boolean, modifier: Modifier = Modifie
     }
 }
 @Composable
-fun WeeklyForecastContent(inWeatherData: ForecastModel) {
+fun WeeklyForecastContent(inWeatherData: ForecastModel, OnWeeklyCardClick:(Int)-> Unit ) {
     Box(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
@@ -151,18 +228,19 @@ fun WeeklyForecastContent(inWeatherData: ForecastModel) {
             horizontalArrangement = Arrangement.spacedBy(16.dp),
             contentPadding = PaddingValues(vertical = 8.dp)
         ) {
+            val isDay = (inWeatherData.current.is_day==1)
             items(inWeatherData.forecast.forecastday.count()){ index ->
-                WeeklyForecastCard(inWeatherData, index)
+                val forcastDay = inWeatherData.forecast.forecastday[index]
+                WeeklyForecastCard(forcastDay, index, isDay, {OnWeeklyCardClick(index)} )
             }
         }
     }
 }
 
 @Composable
-fun WeeklyForecastCard(forecastModel: ForecastModel, indexDay : Int) {
+fun WeeklyForecastCard(forecastDay: ForecastDay, indexDay : Int, isDay : Boolean, OnCardClick: () -> Unit) {
 
 //
-    val forecastDay = forecastModel.forecast.forecastday[indexDay]
     val isToday = indexDay == 0
 
     val dayOfWeek = convertDateToDayOfWeek(forecastDay.date)
@@ -176,6 +254,7 @@ fun WeeklyForecastCard(forecastModel: ForecastModel, indexDay : Int) {
                 shape = RoundedCornerShape(20.dp)
             )
             .padding(vertical = 16.dp, horizontal = 12.dp)
+            .clickable(onClick = {OnCardClick()})
     ) {
         // Time
         Text(
@@ -187,7 +266,7 @@ fun WeeklyForecastCard(forecastModel: ForecastModel, indexDay : Int) {
 
         Spacer(modifier = Modifier.height(12.dp))
 
-        val isDay = !isToday || forecastModel.current.is_day == 1
+        val isDay = !isToday || isDay
         // Weather Icon
         WeatherIcon(
             conditionCode = forecastDay.day.condition.code,

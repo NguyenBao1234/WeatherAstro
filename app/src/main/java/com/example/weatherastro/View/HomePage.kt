@@ -5,7 +5,6 @@ import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -20,7 +19,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
@@ -30,14 +28,10 @@ import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Tab
-import androidx.compose.material3.TabRow
-import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -48,14 +42,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
@@ -65,7 +57,7 @@ import com.example.weatherastro.Model.Forecast.ForecastModel
 import com.example.weatherastro.R
 
 @Composable
-fun HomePage(inViewModel : WeatherVM, onDetailClick : () -> Unit)
+fun HomePage(inViewModel : WeatherVM, onDetailClick : () -> Unit, OnWeeklyForcastClick:(Int) -> Unit )
 {
     val WeatherResponseState = inViewModel.forecastResponse.observeAsState()
 
@@ -138,7 +130,7 @@ fun HomePage(inViewModel : WeatherVM, onDetailClick : () -> Unit)
             {
                 is ApiState.Error -> Text(result.message)
                 is ApiState.Loading -> CircularProgressIndicator()
-                is ApiState.Success<ForecastModel> -> DrawWeatherOverview(result.dataInstance, onDetailClick)
+                is ApiState.Success<ForecastModel> -> DrawWeatherOverview(result.dataInstance, onDetailClick, OnWeeklyForcastClick)
                 null ->{}
             }
         }
@@ -146,7 +138,7 @@ fun HomePage(inViewModel : WeatherVM, onDetailClick : () -> Unit)
 
 }
 @Composable
-fun DrawWeatherOverview(inWeatherData: ForecastModel, onDetailClick : () -> Unit)
+fun DrawWeatherOverview(inWeatherData: ForecastModel, onDetailClick : () -> Unit, OnWeeklyCardClick: (Int) -> Unit)
 {
     Column (modifier = Modifier
         .fillMaxWidth()
@@ -201,7 +193,7 @@ fun DrawWeatherOverview(inWeatherData: ForecastModel, onDetailClick : () -> Unit
                 }
             }
         }
-        WeatherForecastScreen(inWeatherData)
+        WeatherForecastScreen(inWeatherData,{dayIndexParam->OnWeeklyCardClick(dayIndexParam)})
         Spacer(Modifier.height(45.dp))
     }
 }
@@ -217,76 +209,6 @@ fun DrawColumnProperty(inProperty:String, inValue:String)
     }
 }
 
-@Composable
-fun WeatherForecastScreen(inWeatherData: ForecastModel) {
-    var selectedTab by remember { mutableStateOf(0) }
-    val tabs = listOf("Dự báo theo giờ", "Dự báo theo tuần")
-
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(
-//                Brush.verticalGradient(
-//                    colors = listOf(
-//                        Color(0xFF1A1A2E),
-//                        Color(0xFF16213E),
-//                        Color(0xFF0F3460)
-//                    )
-//                )
-                shape = RoundedCornerShape(15.dp),
-                color = Color(0x4D0F3460)
-            )
-            .padding(16.dp),
-    ) {
-        // Tab Row
-        TabRow(
-            selectedTabIndex = selectedTab,
-            containerColor = Color.Transparent,
-            divider = {
-                Divider(
-                    color = Color.Gray,
-                    thickness = 1.dp
-                )
-            },
-            indicator = { tabPositions ->
-                Box(
-                    modifier = Modifier
-                        .tabIndicatorOffset(tabPositions[selectedTab])
-                        .height(3.dp)
-                        .padding(horizontal = 24.dp)
-                        .background(
-                            Color(0xFF00335D),
-                            shape = RoundedCornerShape(topStart = 3.dp, topEnd = 3.dp)
-                        )
-                )
-            }
-
-        ) {
-            tabs.forEachIndexed { index, title ->
-                Tab(
-                    selected = selectedTab == index,
-                    onClick = { selectedTab = index },
-                    text = {
-                        Text(
-                            text = title,
-                            fontSize = 16.sp,
-                            fontWeight = if (selectedTab == index) FontWeight.Bold else FontWeight.Normal,
-                            color = if (selectedTab == index) Color.White else Color.White.copy(alpha = 0.6f)
-                        )
-                    }
-                )
-            }
-        }
-
-        Spacer(modifier = Modifier.height(24.dp))
-
-        // Content
-        when (selectedTab) {
-            0 -> HourlyForecastPage(inWeatherData)
-            1 -> WeeklyForecastContent(inWeatherData)
-        }
-    }
-}
 
 fun getBackgroundByCode(inConditionCode: Int, isDay: Boolean): Int {
     return when (inConditionCode) {

@@ -22,5 +22,5 @@ data class Day(
     val totalprecip_in: String,
     val totalprecip_mm: String,
     val totalsnow_cm: String,
-    val uv: String
+    val uv: Float
 )

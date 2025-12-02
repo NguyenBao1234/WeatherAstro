@@ -1,10 +1,9 @@
 package com.example.weatherastro.View
 
-import android.view.LayoutInflater
-import android.view.View
-import android.widget.TextView
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -18,7 +17,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.ArrowBack
+
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -34,11 +33,11 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.viewinterop.AndroidView
+
 import coil.compose.AsyncImage
 import com.example.weatherastro.Model.ApiState
 import com.example.weatherastro.Model.Forecast.ForecastModel
-import com.example.weatherastro.Model.WeatherModel
+
 import com.example.weatherastro.ViewModel.WeatherVM
 import com.example.weatherastro.R
 
@@ -47,7 +46,26 @@ import com.example.weatherastro.R
 fun WeatherDetail (inWeatherVM : WeatherVM, onBackPress : ()-> Unit)
 {
     val WeatherResponseState = inWeatherVM.forecastResponse.observeAsState()
-    Column(modifier = Modifier.fillMaxSize()) {
+    val bgImage = when (val result = WeatherResponseState.value) {
+        is ApiState.Success<ForecastModel> -> {
+            val currentWeather = result.dataInstance.current
+            val conditionCode = currentWeather.condition.code
+            val isDay = currentWeather.is_day == 1
+            getBackgroundByCode(conditionCode, isDay)
+        }
+        else -> R.drawable.home_page
+    }
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color.Transparent)
+    )
+    {
+        Image(
+            painter = painterResource(id = bgImage),
+            contentDescription = null,
+            modifier = Modifier.fillMaxSize()
+        )
         IconButton(onClick = {onBackPress()}) {
             Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Quay lại")
         }
@@ -67,11 +85,7 @@ fun DrawDetailPage(inWeatherData: ForecastModel)
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .verticalScroll(rememberScrollState(0))
-            .paint(
-                painter = painterResource(id = R.drawable.home_page),
-                contentScale = ContentScale.Crop
-            ),
+            .verticalScroll(rememberScrollState(0)),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         AsyncImage(
@@ -93,8 +107,8 @@ fun DrawDetailPage(inWeatherData: ForecastModel)
 
         // KHỐI THÔNG TIN 2 (info_box_2)
         WeatherInfoBox2(inWeatherData)
+        HourlyForecastPage(inWeatherData.forecast.forecastday[0].hour, inWeatherData.location.localtime)
     }
-
 }
 
 @Composable
@@ -105,7 +119,7 @@ fun WeatherInfoBox1(inWheatherdata: ForecastModel)
             .fillMaxWidth(0.9f) // Giới hạn chiều rộng (tương đương 400dp)
             .padding(16.dp)
             // Tương đương android:background="@drawable/weather_info"
-            .background(Color(0x80E0E0E0), shape = RoundedCornerShape(12.dp))
+            .background(Color(0x4D0F3460), shape = RoundedCornerShape(12.dp))
     ) {
         DetailCard(
             value = "${inWheatherdata.current.humidity}%",
@@ -165,7 +179,7 @@ fun GridItem(value: String, label: String, modifier: Modifier = Modifier) {
         modifier = modifier
             .padding(6.dp) // Tương đương margin 6dp
             .height(70.dp)
-            .background(Color(0x80E0E0E0), shape = RoundedCornerShape(8.dp))
+            .background(Color(0x4D0F3460), shape = RoundedCornerShape(8.dp))
             .padding(10.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
@@ -190,7 +204,7 @@ fun WeatherInfoBox2(data: ForecastModel) {
         modifier = Modifier
             .fillMaxWidth(0.9f) // Giới hạn chiều rộng
             .padding(16.dp)
-            .background(Color(0x80E0E0E0), shape = RoundedCornerShape(12.dp))
+            .background(Color(0x4DE0E0E0), shape = RoundedCornerShape(12.dp))
     ) {
         // GRID 2: 2 hàng, 2 cột
         Column {
