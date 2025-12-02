@@ -70,16 +70,17 @@ fun ForecastDayDetail (inWeatherVM : WeatherVM, dayIndex : Int, onBackPress : ()
             contentDescription = null,
             modifier = Modifier.fillMaxSize()
         )
-        IconButton(onClick = {onBackPress()},
-            modifier = Modifier.padding(top = 15.dp)) {
-            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Quay lại")
-        }
+
         when(val result = WeatherResponseState.value)
         {
             is ApiState.Error -> Text(result.message)
             is ApiState.Loading -> CircularProgressIndicator()
             is ApiState.Success<ForecastModel> -> ForecastDetailPage(result.dataInstance.forecast.forecastday[dayIndex])
             null ->{}
+        }
+        IconButton(onClick = {onBackPress()},
+            modifier = Modifier.padding(top = 25.dp)) {
+            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Quay lại")
         }
     }
 }

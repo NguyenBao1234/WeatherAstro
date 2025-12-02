@@ -66,16 +66,17 @@ fun WeatherDetail (inWeatherVM : WeatherVM, onBackPress : ()-> Unit)
             contentDescription = null,
             modifier = Modifier.fillMaxSize()
         )
-        IconButton(onClick = {onBackPress()}) {
-            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Quay lại")
-        }
-        Text("Detail")
+
         when(val result = WeatherResponseState.value)
         {
             is ApiState.Error -> Text(result.message)
             is ApiState.Loading -> CircularProgressIndicator()
             is ApiState.Success<ForecastModel> -> DrawDetailPage(result.dataInstance)
             null ->{}
+        }
+        IconButton(onClick = {onBackPress()},
+            modifier = Modifier.padding(top = 25.dp)) {
+            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Quay lại")
         }
     }
 }

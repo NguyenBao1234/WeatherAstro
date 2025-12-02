@@ -45,7 +45,7 @@ class MainActivity : ComponentActivity()
                 }
                 composable(Route.WeatherDetail) {
                     WeatherDetail(mWeatherModel,
-                        onBackPress ={mNavController.navigate(Route.Home)})
+                        onBackPress ={ mNavController.popBackStack()})
                 }
                 composable(
                     route = Route.ForcastDayDetail,
