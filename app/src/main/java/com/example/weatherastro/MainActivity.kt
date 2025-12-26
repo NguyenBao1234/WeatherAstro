@@ -6,6 +6,8 @@ import android.app.Activity
 import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.os.Looper
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -16,13 +18,17 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.example.weatherastro.Model.Forecast.ForecastModel
+import com.example.weatherastro.Model.ApiState
 import com.example.weatherastro.View.ForecastDayDetail
 import com.example.weatherastro.View.WeatherDetail
 import com.example.weatherastro.View.HomePage
 import com.example.weatherastro.ViewModel.WeatherVM
 import com.example.weatherastro.ui.navigation.Route
+import com.google.android.gms.location.LocationCallback
+import com.google.android.gms.location.LocationRequest
+import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationServices
+import com.google.android.gms.location.Priority
 
 
 class MainActivity : ComponentActivity()
@@ -31,6 +37,22 @@ class MainActivity : ComponentActivity()
 
     override fun onCreate(savedInstanceState: Bundle?)
     {
+        mWeatherModel.forecastApiResponse.value = ApiState.Loading
+        val savedLocation = LoadSavedLocation(this)
+
+        if (savedLocation != null) {
+            val (lat, lon) = savedLocation
+            val locationString = "$lat,$lon"
+            mWeatherModel.GetData(locationString)
+            Log.d("Location", "Exist Location, Loaded location -> lat=$lat , lon=$lon")
+        } else {
+            GetCurrentLocation(this) { lat, lon ->
+                val locationString = "$lat,$lon"
+                SaveLocation(this, lat, lon)
+                mWeatherModel.GetData(locationString)
+                Log.d("Location", "No Location, Get via GPS location -> lat=$lat , lon=$lon")
+            }
+        }
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
@@ -64,8 +86,9 @@ class MainActivity : ComponentActivity()
     }
 }
 @SuppressLint("MissingPermission")
-fun getCurrentLocation(context: Context, onResult: (lat: Double, lon: Double) -> Unit) {
-    val fused = LocationServices.getFusedLocationProviderClient(context)
+fun GetCurrentLocation(context: Context, onResult: (lat: Double, lon: Double) -> Unit)
+{
+    val fused = LocationServices.getFusedLocationProviderClient(context) //Google Play Services(GPS + Wifi + Cell)
 
     if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION)
         != PackageManager.PERMISSION_GRANTED &&
@@ -77,17 +100,44 @@ fun getCurrentLocation(context: Context, onResult: (lat: Double, lon: Double) ->
             arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION),
             100
         )
+        Log.d("Location", "Request Permission Finish");
         return
     }
 
     fused.lastLocation.addOnSuccessListener { location ->
         if (location != null) {
+            Log.d("Location", "GPS: Get Location Cache Success");
             onResult(location.latitude, location.longitude)
+        }
+        else{
+            Log.d("Location", "GPS: Get Location Failed, New Request Location Start");
+            val locationRequest = LocationRequest.Builder(
+                Priority.PRIORITY_HIGH_ACCURACY,
+                0L
+            )
+                .setWaitForAccurateLocation(true)
+                .setMaxUpdates(1)
+                .build()
+
+            fused.requestLocationUpdates(
+                locationRequest,
+                object : LocationCallback() {
+                    override fun onLocationResult(result: LocationResult) {
+                        val location = result.lastLocation
+                        if (location != null) {
+                            Log.d("Location", "GPS: Get Location Success")
+                            onResult(location.latitude, location.longitude)
+                        }
+                        fused.removeLocationUpdates(this)
+                    }
+                },
+                Looper.getMainLooper()
+            )
         }
     }
 }
 
-fun saveLocation(context: Context, lat: Double, lon: Double) {
+fun SaveLocation(context: Context, lat: Double, lon: Double) {
     val pref = context.getSharedPreferences("weather_prefs", Context.MODE_PRIVATE)
     pref.edit()
         .putFloat("lat", lat.toFloat())
@@ -95,7 +145,7 @@ fun saveLocation(context: Context, lat: Double, lon: Double) {
         .apply()
 }
 
-fun loadSavedLocation(context: Context): Pair<Double, Double>? {
+fun LoadSavedLocation(context: Context): Pair<Double, Double>? {
     val pref = context.getSharedPreferences("weather_prefs", Context.MODE_PRIVATE)
     if (!pref.contains("lat")) return null
     val lat = pref.getFloat("lat", 0f).toDouble()

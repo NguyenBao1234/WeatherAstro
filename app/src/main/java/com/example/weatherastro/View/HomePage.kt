@@ -43,6 +43,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
@@ -55,6 +56,7 @@ import com.example.weatherastro.ViewModel.WeatherVM
 import com.example.weatherastro.Model.ApiState
 import com.example.weatherastro.Model.Forecast.ForecastModel
 import com.example.weatherastro.R
+import com.example.weatherastro.SaveLocation
 
 @Composable
 fun HomePage(inViewModel : WeatherVM, onDetailClick : () -> Unit, OnWeeklyForcastClick:(Int) -> Unit )
@@ -140,6 +142,7 @@ fun HomePage(inViewModel : WeatherVM, onDetailClick : () -> Unit, OnWeeklyForcas
 @Composable
 fun DrawWeatherOverview(inWeatherData: ForecastModel, onDetailClick : () -> Unit, OnWeeklyCardClick: (Int) -> Unit)
 {
+    SaveLocation(LocalContext.current,inWeatherData.location.lat, inWeatherData.location.lon)
     Column (modifier = Modifier
         .fillMaxWidth()
         .padding(vertical = 8.dp),

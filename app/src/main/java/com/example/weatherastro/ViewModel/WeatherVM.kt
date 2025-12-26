@@ -15,14 +15,14 @@ class WeatherVM : ViewModel()
 {
     private val WeatherApiInst = RetrofitObj.WeatherApiInstance
     private val _WeatherApiResponse = MutableLiveData<ApiState<WeatherModel>>()
-    private val _ForecastApiResponse = MutableLiveData<ApiState<ForecastModel>>()
+    public val forecastApiResponse = MutableLiveData<ApiState<ForecastModel>>()
     val mWeatherResponse : LiveData<ApiState<WeatherModel>> = _WeatherApiResponse
-    val forecastResponse : LiveData<ApiState<ForecastModel>> = _ForecastApiResponse
+    val forecastResponse : LiveData<ApiState<ForecastModel>> = forecastApiResponse
 
     fun GetData(inCityName:String)
     {
         Log.i("Requesting City Name:" ,inCityName)
-        _ForecastApiResponse.value = ApiState.Loading
+        forecastApiResponse.value = ApiState.Loading
 
         viewModelScope.launch {
             try
@@ -31,12 +31,12 @@ class WeatherVM : ViewModel()
                 if(ResponseData.isSuccessful)
                 {
                     Log.i("APIResponse Success:",ResponseData.body().toString())
-                    ResponseData.body()?.let{_ForecastApiResponse.value = ApiState.Success(it) }
+                    ResponseData.body()?.let{forecastApiResponse.value = ApiState.Success(it) }
                 }
-                else _ForecastApiResponse.value = ApiState.Error("Failed to load data")
+                else forecastApiResponse.value = ApiState.Error("Failed to load data")
 
             } catch (e: Exception) {
-                _ForecastApiResponse.value = ApiState.Error("Failed to load data")
+                forecastApiResponse.value = ApiState.Error("Failed to load data")
             }
         }
 

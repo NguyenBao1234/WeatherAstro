@@ -53,7 +53,7 @@ fun WeatherDetail (inWeatherVM : WeatherVM, onBackPress : ()-> Unit)
             val isDay = currentWeather.is_day == 1
             getBackgroundByCode(conditionCode, isDay)
         }
-        else -> R.drawable.home_page
+        else -> R.drawable.home_page//<-this is a default image background
     }
     Box(
         modifier = Modifier
