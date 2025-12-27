@@ -84,6 +84,23 @@ class MainActivity : ComponentActivity()
             })
         }
     }
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+
+        if (requestCode == 100 &&
+            grantResults.isNotEmpty() &&
+            grantResults[0] == PackageManager.PERMISSION_GRANTED
+        ) {
+            GetCurrentLocation(this) { lat, lon ->
+                mWeatherModel.GetData("$lat,$lon")
+                Log.d("Location", "First time Get location via GPS  -> lat=$lat , lon=$lon")
+            }
+        }
+    }
 }
 @SuppressLint("MissingPermission")
 fun GetCurrentLocation(context: Context, onResult: (lat: Double, lon: Double) -> Unit)
