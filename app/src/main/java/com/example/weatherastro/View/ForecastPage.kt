@@ -226,7 +226,7 @@ fun WeeklyForecastContent(inWeatherData: ForecastModel, OnWeeklyCardClick:(Int)-
     ) {
         LazyRow(
             horizontalArrangement = Arrangement.spacedBy(16.dp),
-            contentPadding = PaddingValues(vertical = 8.dp)
+            contentPadding = PaddingValues(vertical = 8.dp),
         ) {
             val isDay = (inWeatherData.current.is_day==1)
             items(inWeatherData.forecast.forecastday.count()){ index ->

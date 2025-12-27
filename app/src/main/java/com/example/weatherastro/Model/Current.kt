@@ -25,7 +25,7 @@ data class Current(
     val short_rad: Double,
     val temp_c: Double,
     val temp_f: Double,
-    val uv: Double,
+    val uv: Float,
     val vis_km: Double,
     val vis_miles: Double,
     val wind_degree: Double,

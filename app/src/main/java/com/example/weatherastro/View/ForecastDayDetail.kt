@@ -2,25 +2,20 @@ package com.example.weatherastro.View
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Divider
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -119,12 +114,25 @@ fun ForecastDetailPage(forecastDay: ForecastDay)
             "$dateStr 00:00"
         }
 
-        DetailForecast(forecastDay.day)
-        HourlyForecastPage(forecastDay.hour, time, !isToday )
+        DayDetailForecast(forecastDay.day, dateStr)
+        Column(
+            modifier = Modifier
+                .fillMaxWidth(0.9f)
+                .padding(8.dp)
+                .background(Color(0x00FFFFFF))
+        ) { HourlyForecastPage(forecastDay.hour, time, !isToday) }
+        Spacer(modifier = Modifier.height(150.dp))
     }
+
 }
 @Composable
-fun DetailForecast(data: Day) {
+fun DayDetailForecast(data: Day, date : String)
+{
+    val inputFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+    val outputFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy")
+
+    val formattedDate = LocalDate.parse(date, inputFormatter)
+        .format(outputFormatter)
     Column(
         modifier = Modifier
             .fillMaxWidth(0.9f)
@@ -133,7 +141,7 @@ fun DetailForecast(data: Day) {
             .padding(16.dp)
     ) {
         Text(
-            text = "Chi tiết dự báo",
+            text = "Chi tiết ngày $formattedDate",
             fontSize = 20.sp,
             fontWeight = FontWeight.Bold,
             color = Color.Black,
@@ -160,7 +168,7 @@ fun DetailForecast(data: Day) {
         )
 
         Spacer(modifier = Modifier.height(8.dp))
-        Divider(color = Color.Gray.copy(alpha = 0.3f), thickness = 1.dp)
+        HorizontalDivider(color = Color.Gray.copy(alpha = 0.3f), thickness = 1.dp)
         Spacer(modifier = Modifier.height(8.dp))
 
         // Độ ẩm và gió
@@ -180,7 +188,7 @@ fun DetailForecast(data: Day) {
         )
 
         Spacer(modifier = Modifier.height(8.dp))
-        Divider(color = Color.Gray.copy(alpha = 0.3f), thickness = 1.dp)
+        HorizontalDivider(color = Color.Gray.copy(alpha = 0.3f), thickness = 1.dp)
         Spacer(modifier = Modifier.height(8.dp))
 
         // Mưa và tuyết
@@ -211,7 +219,7 @@ fun DetailForecast(data: Day) {
         }
 
         Spacer(modifier = Modifier.height(8.dp))
-        Divider(color = Color.Gray.copy(alpha = 0.3f), thickness = 1.dp)
+        HorizontalDivider(color = Color.Gray.copy(alpha = 0.3f), thickness = 1.dp)
         Spacer(modifier = Modifier.height(8.dp))
 
         // UV
@@ -220,57 +228,5 @@ fun DetailForecast(data: Day) {
             value = data.uv.toString(),
             uvIndex = data.uv
         )
-    }
-}
-
-@Composable
-private fun WeatherDetailItem(
-    label: String,
-    value: String,
-    uvIndex: Float? = null
-) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 6.dp),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Text(
-            text = label,
-            fontSize = 15.sp,
-            color = Color.Black.copy(alpha = 0.7f),
-            modifier = Modifier.weight(1f)
-        )
-
-        Row(
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                text = value,
-                fontSize = 15.sp,
-                fontWeight = FontWeight.SemiBold,
-                color = Color.Black
-            )
-
-            // Hiển thị mức độ UV bằng màu
-            uvIndex?.let {
-                Spacer(modifier = Modifier.width(8.dp))
-                Box(
-                    modifier = Modifier
-                        .size(12.dp)
-                        .background(
-                            color = when {
-                                it <= 2 -> Color(0xFF4CAF50) // Thấp - Xanh lá
-                                it <= 5 -> Color(0xFFFFEB3B) // Trung bình - Vàng
-                                it <= 7 -> Color(0xFFFF9800) // Cao - Cam
-                                it <= 10 -> Color(0xFFF44336) // Rất cao - Đỏ
-                                else -> Color(0xFF9C27B0) // Cực cao - Tím
-                            },
-                            shape = CircleShape
-                        )
-                )
-            }
-        }
     }
 }

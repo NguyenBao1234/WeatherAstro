@@ -5,7 +5,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -19,6 +18,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
@@ -26,9 +26,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.paint
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -102,52 +100,123 @@ fun DrawDetailPage(inWeatherData: ForecastModel)
             modifier = Modifier.padding(top = 8.dp)
         )
 
-        WeatherInfoBox1( inWeatherData)
+        CurrentDetailsForecast( inWeatherData)
 
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // KHỐI THÔNG TIN 2 (info_box_2)
-        WeatherInfoBox2(inWeatherData)
-        HourlyForecastPage(inWeatherData.forecast.forecastday[0].hour, inWeatherData.location.localtime)
+        Column(
+            modifier = Modifier
+                .fillMaxWidth(0.9f)
+                .padding(8.dp)
+                .background(Color(0x00FFFFFF))
+        ) {HourlyForecastPage(inWeatherData.forecast.forecastday[0].hour, inWeatherData.location.localtime)}
+        Spacer(modifier = Modifier.height(90.dp))
     }
 }
 
 @Composable
-fun WeatherInfoBox1(inWheatherdata: ForecastModel)
+fun CurrentDetailsForecast(inWheatherdata: ForecastModel)
 {
     Column(
         modifier = Modifier
-            .fillMaxWidth(0.9f) // Giới hạn chiều rộng (tương đương 400dp)
+            .fillMaxWidth(0.9f)
             .padding(16.dp)
-            // Tương đương android:background="@drawable/weather_info"
-            .background(Color(0x4D0F3460), shape = RoundedCornerShape(12.dp))
-    ) {
-        DetailCard(
-            value = "${inWheatherdata.current.humidity}%",
-            label = "Độ ẩm",
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 12.dp)
-                .height(70.dp)
+            .background(Color(0x4DFFFFFF), shape = RoundedCornerShape(12.dp))
+            .padding(16.dp)
+    ){
+        Text(
+            text = "Chi tiết dự báo",
+            fontSize = 20.sp,
+            fontWeight = FontWeight.Bold,
+            color = Color.Black,
+            modifier = Modifier.padding(bottom = 12.dp)
         )
-        // GRID 1: 3 hàng, 2 cột (sử dụng Row và weight)
-        Column {
-            // Hàng 1
-            Row(modifier = Modifier.fillMaxWidth()) {
-                GridItem(value = "${inWheatherdata.current.wind_kph} km/h", label = "Tốc độ gió", modifier = Modifier.weight(1f))
-                GridItem(value = inWheatherdata.current.wind_dir, label = "Hướng gió", modifier = Modifier.weight(1f))
-            }
-            // Hàng 2
-            Row(modifier = Modifier.fillMaxWidth()) {
-                GridItem(value = "${inWheatherdata.current.pressure_in} inHg", label = "Áp suất", modifier = Modifier.weight(1f))
-                GridItem(value = "${inWheatherdata.current.cloud}%", label = "Mây che phủ", modifier = Modifier.weight(1f))
-            }
-            // Hàng 3
-            Row(modifier = Modifier.fillMaxWidth()) {
-                GridItem(value = "${inWheatherdata.current.precip_mm}mm", label = "Lượng mưa", modifier = Modifier.weight(1f))
-                GridItem(value = "${inWheatherdata.current.gust_kph} km/h", label = "Gió giật", modifier = Modifier.weight(1f))
-            }
+        val current = inWheatherdata.current
+        HorizontalDivider(color = Color.Gray.copy(alpha = 0.3f), thickness = 1.dp)
+        Spacer(modifier = Modifier.height(12.dp))
+
+        // Nhiệt độ
+        WeatherDetailItem(
+            label = "Nhiệt độ hiện tại",
+            value = "${current.temp_c}°C / ${current.temp_f}°F"
+        )
+
+        WeatherDetailItem(
+            label = "Cảm giác như",
+            value = "${current.feelslike_c}°C / ${current.feelslike_f}°F"
+        )
+
+        WeatherDetailItem(
+            label = "Chỉ số nóng",
+            value = "${current.heatindex_c}°C / ${current.heatindex_f}°F"
+        )
+
+        WeatherDetailItem(
+            label = "Nhiệt độ gió lạnh",
+            value = "${current.windchill_c}°C / ${current.windchill_f}°F"
+        )
+
+        Spacer(modifier = Modifier.height(8.dp))
+        HorizontalDivider(color = Color.Gray.copy(alpha = 0.3f), thickness = 1.dp)
+        Spacer(modifier = Modifier.height(8.dp))
+
+// Độ ẩm & gió
+        WeatherDetailItem(
+            label = "Độ ẩm",
+            value = "${current.humidity}%"
+        )
+
+        WeatherDetailItem(
+            label = "Tốc độ gió",
+            value = "${current.wind_kph} km/h (${current.wind_mph} mph)"
+        )
+
+        WeatherDetailItem(
+            label = "Hướng gió",
+            value = "${current.wind_dir} (${current.wind_degree}°)"
+        )
+
+        WeatherDetailItem(
+            label = "Gió giật",
+            value = "${current.gust_kph} km/h (${current.gust_mph} mph)"
+        )
+
+        Spacer(modifier = Modifier.height(8.dp))
+        HorizontalDivider(color = Color.Gray.copy(alpha = 0.3f), thickness = 1.dp)
+        Spacer(modifier = Modifier.height(8.dp))
+
+// Tầm nhìn & áp suất
+        WeatherDetailItem(
+            label = "Tầm nhìn",
+            value = "${current.vis_km} km (${current.vis_miles} miles)"
+        )
+
+        WeatherDetailItem(
+            label = "Áp suất",
+            value = "${current.pressure_mb} mb (${current.pressure_in} in)"
+        )
+
+        WeatherDetailItem(
+            label = "Độ che phủ mây",
+            value = "${current.cloud}%"
+        )
+
+        Spacer(modifier = Modifier.height(8.dp))
+        HorizontalDivider(color = Color.Gray.copy(alpha = 0.3f), thickness = 1.dp)
+        Spacer(modifier = Modifier.height(8.dp))
+
+// Mưa
+        if (current.precip_mm > 0) {
+            WeatherDetailItem(
+                label = "Lượng mưa",
+                value = "${current.precip_mm} mm (${current.precip_in} in)"
+            )
         }
+
+// UV
+        WeatherDetailItem(
+            label = "Chỉ số UV",
+            value = current.uv.toString(),
+            uvIndex = current.uv
+        )
     }
 }
 
@@ -196,29 +265,5 @@ fun GridItem(value: String, label: String, modifier: Modifier = Modifier) {
             fontSize = 14.sp,
             color = Color.Black
         )
-    }
-}
-
-@Composable
-fun WeatherInfoBox2(data: ForecastModel) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth(0.9f) // Giới hạn chiều rộng
-            .padding(16.dp)
-            .background(Color(0x4DE0E0E0), shape = RoundedCornerShape(12.dp))
-    ) {
-        // GRID 2: 2 hàng, 2 cột
-        Column {
-            // Hàng 1
-            Row(modifier = Modifier.fillMaxWidth()) {
-                GridItem(value = "${data.current.feelslike_c}°C", label = "Cảm thấy như", modifier = Modifier.weight(1f))
-                GridItem(value = "${data.current.windchill_c}°C", label = "Nhiệt độ gió", modifier = Modifier.weight(1f))
-            }
-            // Hàng 2
-            Row(modifier = Modifier.fillMaxWidth()) {
-                GridItem(value = "${data.current.uv}", label = "Chỉ số UV", modifier = Modifier.weight(1f))
-                GridItem(value = "${data.current.vis_km} km", label = "Tầm nhìn xa", modifier = Modifier.weight(1f))
-            }
-        }
     }
 }

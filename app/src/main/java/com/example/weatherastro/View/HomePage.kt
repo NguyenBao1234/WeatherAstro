@@ -197,7 +197,7 @@ fun DrawWeatherOverview(inWeatherData: ForecastModel, onDetailClick : () -> Unit
             }
         }
         WeatherForecastScreen(inWeatherData,{dayIndexParam->OnWeeklyCardClick(dayIndexParam)})
-        Spacer(Modifier.height(45.dp))
+        Spacer(Modifier.height(80.dp))
     }
 }
 @Composable
