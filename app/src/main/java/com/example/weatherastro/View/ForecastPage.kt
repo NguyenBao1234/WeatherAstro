@@ -59,13 +59,6 @@ fun WeatherForecastScreen(inWeatherData: ForecastModel, OnWeeklyCardClick: (Int)
         modifier = Modifier
             .fillMaxSize()
             .background(
-//                Brush.verticalGradient(
-//                    colors = listOf(
-//                        Color(0xFF1A1A2E),
-//                        Color(0xFF16213E),
-//                        Color(0xFF0F3460)
-//                    )
-//                )
                 shape = RoundedCornerShape(15.dp),
                 color = Color(0x4D0F3460)
             )
@@ -151,9 +144,9 @@ fun HourlyForecastPage(inHourData: List<Hour>, inLocaltime: String, isForecastDa
 }
 
 @Composable
-fun HourlyForecastCard(hour: Hour, isNow: Boolean = false, isForecastDay : Boolean, OnClick:(Hour) -> Unit) {
-    val time = hour.time.split(" ")[1] // Lấy phần giờ từ "2024-01-01 14:00"
-
+fun HourlyForecastCard(hour: Hour, isNow: Boolean = false, isForecastDay : Boolean, OnClick:(Hour) -> Unit)
+{
+    val time = hour.time.split(" ")[1] // Lấy phần giờ
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
@@ -293,10 +286,10 @@ fun WeeklyForecastCard(forecastDay: ForecastDay, indexDay : Int, isDay : Boolean
         )
     }
 }
-fun convertDateToDayOfWeek(dateString: String): String {
 
-
-    // 1. Tạo đối tượng Locale tiếng Việt bằng hàm khởi tạo (Hỗ trợ tốt trên các API cũ)
+fun convertDateToDayOfWeek(dateString: String): String
+{
+    // 1. Tạo đối tượng Locale tiếng Việt
     val vietnameseLocale: Locale = Locale("vi", "VN")
     val parser = DateTimeFormatter.ofPattern("yyyy-MM-dd") // Dùng Locale.US để parsing format chuẩn quốc tế
 

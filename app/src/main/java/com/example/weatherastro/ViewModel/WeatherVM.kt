@@ -14,9 +14,7 @@ import kotlinx.coroutines.launch
 class WeatherVM : ViewModel()
 {
     private val WeatherApiInst = RetrofitObj.WeatherApiInstance
-    private val _WeatherApiResponse = MutableLiveData<ApiState<WeatherModel>>()
     public val forecastApiResponse = MutableLiveData<ApiState<ForecastModel>>()
-    val mWeatherResponse : LiveData<ApiState<WeatherModel>> = _WeatherApiResponse
     val forecastResponse : LiveData<ApiState<ForecastModel>> = forecastApiResponse
 
     fun GetData(inCityName:String)

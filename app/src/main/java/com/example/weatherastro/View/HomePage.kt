@@ -166,7 +166,7 @@ fun DrawWeatherOverview(inWeatherData: ForecastModel, onDetailClick : () -> Unit
         )
         Log.i("Log", inWeatherData.current.condition.icon)
         //___________________________________________
-        Text(inWeatherData.current.condition.text, color = Color(0xA6FFFFFF))
+        Text(inWeatherData.current.condition.text)
         //___________________________________________
         Spacer(Modifier.height(15.dp))
         Card (
@@ -207,8 +207,8 @@ fun DrawColumnProperty(inProperty:String, inValue:String)
         .padding(16.dp)
         , horizontalAlignment = Alignment.CenterHorizontally)
     {
-        Text(inValue, fontSize = 24.sp, fontWeight = FontWeight.Bold, color = Color.White)
-        Text(inProperty, color = Color.White)
+        Text(inValue, fontSize = 24.sp, fontWeight = FontWeight.Bold)
+        Text(inProperty)
     }
 }
 

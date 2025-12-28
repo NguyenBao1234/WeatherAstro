@@ -47,10 +47,9 @@ fun ForecastDayDetail (inWeatherVM : WeatherVM, dayIndex : Int, onBackPress : ()
     val WeatherResponseState = inWeatherVM.forecastResponse.observeAsState()
     val bgImage = when (val result = WeatherResponseState.value) {
         is ApiState.Success<ForecastModel> -> {
-            val currentWeather = result.dataInstance.current
-            val conditionCode = currentWeather.condition.code
-            val isDay = currentWeather.is_day == 1
-            getBackgroundByCode(conditionCode, isDay)
+            val currentWeather = result.dataInstance.forecast.forecastday[dayIndex]
+            val conditionCode = currentWeather.day.condition.code
+            getBackgroundByCode(conditionCode, true)
         }
         else -> R.drawable.home_page
     }
@@ -95,7 +94,6 @@ fun ForecastDetailPage(forecastDay: ForecastDay)
         )
         Text(
             text = "${forecastDay.day.avgtemp_c}°C",
-            color = Color.White,
             fontSize = 48.sp,
             fontWeight = FontWeight.Bold,
             modifier = Modifier.padding(top = 8.dp)

@@ -46,12 +46,13 @@ class MainActivity : ComponentActivity()
             mWeatherModel.GetData(locationString)
             Log.d("Location", "Exist Location, Loaded location -> lat=$lat , lon=$lon")
         } else {
-            GetCurrentLocation(this) { lat, lon ->
+            val bSuccess = GetCurrentLocation(this) { lat, lon ->
                 val locationString = "$lat,$lon"
                 SaveLocation(this, lat, lon)
                 mWeatherModel.GetData(locationString)
                 Log.d("Location", "No Location, Get via GPS location -> lat=$lat , lon=$lon")
             }
+            if(!bSuccess) mWeatherModel.forecastApiResponse.value = ApiState.Error("Lấy vị trí thất bại")
         }
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -90,7 +91,7 @@ class MainActivity : ComponentActivity()
         grantResults: IntArray
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-
+        mWeatherModel.forecastApiResponse.value = ApiState.Loading
         if (requestCode == 100 &&
             grantResults.isNotEmpty() &&
             grantResults[0] == PackageManager.PERMISSION_GRANTED
@@ -103,7 +104,7 @@ class MainActivity : ComponentActivity()
     }
 }
 @SuppressLint("MissingPermission")
-fun GetCurrentLocation(context: Context, onResult: (lat: Double, lon: Double) -> Unit)
+fun GetCurrentLocation(context: Context, onResult: (lat: Double, lon: Double) -> Unit):Boolean
 {
     val fused = LocationServices.getFusedLocationProviderClient(context) //Google Play Services(GPS + Wifi + Cell)
 
@@ -118,7 +119,7 @@ fun GetCurrentLocation(context: Context, onResult: (lat: Double, lon: Double) ->
             100
         )
         Log.d("Location", "Request Permission Finish");
-        return
+        return false
     }
 
     fused.lastLocation.addOnSuccessListener { location ->
@@ -152,6 +153,7 @@ fun GetCurrentLocation(context: Context, onResult: (lat: Double, lon: Double) ->
             )
         }
     }
+    return true
 }
 
 fun SaveLocation(context: Context, lat: Double, lon: Double) {
